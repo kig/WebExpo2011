@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<!--
+Copyright 2011 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Author: Eric Bidelman (ericbidelman@chromium.org)
+-->
+<html>
+<head>
+  <title>Introduction to WebGL</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <script src='slides.js'></script>
+  <link href="http://fonts.googleapis.com/css?family=Raleway:100" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|Droid+Sans+Mono&v2">
+</head>
+<body style="display: none">
+
+<section class='slides layout-regular'>
+
+  <article class="biglogo"></article>
+
+  <article id="title" class="title">
+    <div>
+      <h1>Intro to WebGL</h1>
+      <h2 class="subtitle">Ilmari Heikkinen</h2>
+      <h3 class="subtitle"><img style="height:60px; padding-left:70px;" src="images/google_logo.png"></h3>
+    </div>
+  </article>
+
+  <article>
+    <h3>Who am I?</h3>
+    <p>Ilmari Heikkinen</p>
+    <p>@ilmarihei | fhtr.org/plus | fhtr.org</p>
+    <br><br>
+    <p>Google Chrome Developer Programs Engineer</p>
+    <p>I write demos, do presentations, write articles</p>
+  </article>
+
+  <article class="title">
+    <h2>WebGL</h2>
+  </article>
+
+  <article>
+    <h3>What is WebGL?</h3>
+      <p>A Khronos group standard</p>
+      <p>JavaScript meets the GPU</p>
+      <p>Fast programmable drawing</p>
+      <p>OpenGL ES 2.0 for HTML5 Canvas</p>
+  </article>
+
+  <article>
+    <h3>What can you do with it?</h3>
+      <p>Shader-based drawing</p>
+      <p>2D graphics</p>
+      <p>3D graphics</p>
+  </article>
+
+  <article>
+    <h3>Basic idea</h3>
+    <p>Send a list of points to WebGL</p>
+    <p>Vertex shader places them on the screen (screen coords run from -1..1)</p>
+    <p>Fragment shader colors the pixels using vertex shader output</p>
+  </article>
+
+  <article>
+    <h3>And...?</h3>
+    <p>That's pretty much it.</p>
+    <p>WebGL is just a fast way to put lots of triangles, lines and points on the screen.</p>
+    <p>How to transform the vertices and shade the pixels is up to the programmer.</p>
+  </article>
+
+  <article>
+    <h3>What browsers support it?</h3>
+      <p>Chrome</p>
+      <p>Firefox</p>
+      <p>Safari (behind a command-line flag)</p>
+      <p>Opera (in dev build)</p>
+  </article>
+
+  <article>
+    <h3>What can you use it for?</h3>
+      <p>Games</p>
+      <p>Image filters</p>
+      <p>Data visualization</p>
+      <p>3D applications</p>
+      <p>Other things that need fast programmable drawing</p>
+  </article>
+
+
+  <article class="title">
+    <h2>Shaders</h2>
+  </article>
+
+  <article>
+    <h3>What are shaders</h3>
+    <p>Shaders are small programs that tell WebGL</p>
+    <br>
+    <center class="build">
+      <p>where to draw</p>
+      <p class="small">and</p>
+      <p>what to draw<br><br></p>
+      <p style="text-align:left;">Shaders are written in GLSL, the GL Shading Language.</p>
+      <p style="text-align:left;">It's kinda like C for graphics.</p>
+    </center>
+  </article>
+
+  <article>
+    <h3>Vertex shader</h3>
+    <p>Where to draw.</p>
+    <p>Projects geometry to screen coordinates.</p>
+    <pre>
+    &lt;script id="vertex" type="text/x-glsl-vert">
+      varying float vZ;
+      uniform float time;
+      void main() {
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        mvPosition.y += 20.0*sin(time*0.5+mvPosition.x/25.0);
+        mvPosition.x += 30.0*cos(time*0.5+mvPosition.y/25.0);
+        vec4 p = projectionMatrix * mvPosition;
+        vZ = p.z;
+        gl_Position = p;
+      }
+    &lt;/script></pre>
+  </article>
+
+  <article>
+    <h3>Fragment shader</h3>
+    <p>What to draw.</p>
+    <p>Computes the color of a pixel.</p>
+    <pre>
+    &lt;script id="fragment" type="text/x-glsl-frag">
+      varying float vZ;
+      uniform float time;
+      uniform vec2 size;
+      void main() {
+        vec2 d = gl_FragCoord.xy - (0.5+0.02*sin(time))*size;
+        float a = sin(time*0.3)*2.0*3.14159;
+        d = vec2( d.x*cos(a) + d.y*sin(a),
+                 -d.x*sin(a) + d.y*cos(a));
+        vec2 rg = vec2(1.0)-abs(d)/(0.5*size)
+        float b = abs(vZ) / 160.0;
+        gl_FragColor = vec4(rg,b,1.0);
+      }
+    &lt;/script></pre>
+  </article>
+
+  <article>
+    <h3>That's very colourful</h3>
+    <iframe src="three/three_6.html"></iframe>
+  </article>
+
+  <article class="title">
+    <h2>Games</h2>
+  </article>
+
+  <article>
+    <h3>WebGL for Games</h3>
+      <p>3D graphics</p>
+      <p>Fancy shaders</p>
+      <p>Fast 2D graphics</p>
+  </article>
+
+  <article>
+    <h3>Examples</h3>
+    <p><a href="http://chrome.angrybirds.com">Angry Birds</a> uses WebGL to accelerate 2D drawing
+    <p><a href="http://chrome.monsterdashgame.com/">Monster Dash</a> does accelerated 2D as well
+    <p><a href="http://gunbros.glu.com/play">Gun Bros</a> is an isometric 3D game
+  </article>
+
+  <article class="title">
+    <h2>Image processing</h2>
+  </article>
+
+  <article>
+    <h3>Image filters are kinda slow in JavaScript</h3>
+    <p>Runs on the CPU</p>
+    <p>No vector ops yet</p>
+    <p>Parallelizing with Web Workers possible</p>
+  </article>
+
+  <article>
+    <h3>WebGL is very fast at image filters</h3>
+    <p>Output pixels are independent of each other</p>
+    <p>Compute hundreds of pixels in parallel on the GPU</p>
+    <p>GLSL is very expressive for image processing</p>
+  </article>
+
+  <article>
+    <h3>Examples</h3>
+    <p><a href="http://evanw.github.com/webgl-filter">glfx.js</a> - WebGL image filters</p>
+    <p><a href="http://fhtr.org/SprucingUpImages/videoFilters.html">Filtering video</a> in realtime</p>
+  </article>
+
+  <article class="title">
+    <h2>Data Visualization</h2>
+  </article>
+
+  <article>
+    <h3>Data visualization</h3>
+    <p>Sometimes you want to show complex 3D data.</p>
+    <p>Like a spinning globe of search query languages.</p>
+    <p>It's kinda difficult with just HTML, so WebGL helps.</p>
+  </article>
+
+  <article class="nobackground">
+    <h3>WebGL Globe</h3>
+    <iframe src="http://data-arts.appspot.com/globe-search"></iframe>
+  </article>
+
+  <article class="title">
+    <h2>Applications</h2>
+  </article>
+
+  <article>
+    <h3>Perhaps you want to build a 3D modeler</h3>
+    <p>And make it look nice and smooth.</p>
+    <p><a href="http://tinkercad.com">TinkerCAD</a> is a solid CAD program built in WebGL.</p>
+  </article>
+
+  <article>
+    <h3>Or print out spaceships</h3>
+    <p>With an animated preview.</p>
+    <p><a href="http://ship.shapewright.com/">ship.shapewright.com</a> is a random spaceship constructor hooked up to a 3D printing service.</p>
+  </article>
+
+
+  <article class="title">
+    <h2>Using WebGL</h2>
+  </article>
+
+  <article>
+    <h3>Use a library</h3>
+    <p>Raw WebGL is very low-level and very generic.</p>
+    <p>(Write your own shaders to do 3D projections and lighting, there's very little built in.)</p>
+    <p>So, use a library that does what you want.</p>
+    <p>I'm going to show you a couple examples using Three.js.</p>
+  </article>
+
+
+  <article class="title">
+    <h2>Three.js?</h2>
+  </article>
+
+  <article>
+    <h3>Three.js is a JS 3D Engine</h3>
+    <ul>
+      <li>Lightweight</li>
+      <li>WebGL renderer</li>
+      <li>Also has Canvas and SVG renderers</li>
+    </ul>
+  </article>
+
+  <article>
+    <h3>Example: Bar graph</h3>
+    <pre>
+      var grid = /* 2D Array */
+      var barGraph = new THREE.Object3D();
+      scene.addChild(barGraph);
+
+      var max = /* Grid max value */
+      var mat = new THREE.MeshLambertMaterial({color: 0xFFAA55});
+      for (var j=0; j&lt;grid.length; j++) {
+        for (var i=0; i&lt;grid[j].length; i++) {
+          var barHeight = grid[j][i]/max * 80;
+          var geo = new THREE.CubeGeometry(8, barHeight, 8);
+          var mesh = new THREE.Mesh(geo, mat);
+          mesh.position.x = (i-grid[j].length/2) * 16;
+          mesh.position.y = barHeight/2;
+          mesh.position.z = -(j-grid.length/2) * 16;
+          mesh.castShadow = mesh.receiveShadow = true;
+          barGraph.addChild(mesh);
+        }
+      }</pre>
+  </article>
+  
+  <article>
+    <h3>Bar graph in action</h3>
+    <iframe src="three/three_7.html"></iframe>
+  </article>
+
+  <article>
+    <h3>Scatter plot</h3>
+    <pre>
+var scatterPlot = new THREE.Object3D();
+var mat = new THREE.ParticleBasicMaterial(
+  {vertexColors: true, size: 1.5});
+
+var pointCount = 10000;
+var pointGeo = new THREE.Geometry();
+for (var i=0; i&lt;pointCount; i++) {
+  var x = Math.random() * 100 - 50;
+  var y = x*0.8+Math.random() * 20 - 10;
+  var z = x*0.7+Math.random() * 30 - 15;
+  pointGeo.vertices.push(new THREE.Vertex(new THREE.Vector3(x,y,z)));
+  pointGeo.colors.push(new THREE.Color().setHSV(
+    (x+50)/100, (z+50)/100, (y+50)/100));
+}
+var points = new THREE.ParticleSystem(pointGeo, mat);
+scatterPlot.addChild(points);
+scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035);</pre>
+  </article>
+
+  <article>
+    <h3>Scatter plot in action</h3>
+    <iframe src="three/three_8.html"></iframe>
+    <p class="small">Double-click to animate</p>
+  </article>
+
+
+  <article class="title">
+    <h2>Conclusion</h2>
+  </article>
+
+  <article>
+    <h3>WebGL</h3>
+    <p>Open standard</p>
+    <p>Supported by most browsers</p>
+    <p>Fast programmable graphics</p>
+    <p>Hardware-accelerated</p>
+    <p>Helper libraries for getting things done</p>
+  </article>
+  
+  <article>
+    <h3>The End</h3>
+    <p>Ilmari Heikkinen</p>
+    <p>@ilmarihei | fhtr.org/plus | fhtr.org</p>
+  </article>
+
+</section>
+
+<script> 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-XXXXXX-X']);
+  _gaq.push(['_trackPageview']);
+ 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script> 
+<!--[if IE]>
+<script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+<script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+
+</body>
+</html>

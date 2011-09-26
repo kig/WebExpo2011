@@ -1,0 +1,26 @@
+WebGL Introduction
+
+Plan for the presentation:
+
+Show a three.js WebGL app.
+     - something with decently fancy fx
+
+Show how to build a WebGL app using three.js.
+     - explain the process outline
+     
+Start off by setting up the scene, then add child nodes and animate them.
+     - scene setup (clear color, dom append)
+     - add static node (load blender model)
+     - add light
+     - make node spin
+     - add mouse-driven turntable
+
+Create a custom vertex shader to warp the scene.
+     - add sine wavey noise to model x,z-coords
+
+Create a custom fragment shader to warp the colors.
+     - invert colors
+     - fudge with the light source 
+
+Create a custom thingy to warp your mind.
+     - 
